@@ -2,8 +2,41 @@ cmake_minimum_required(VERSION 3.12)
 
 project(vulkan-prebuilt VERSION 1.0.0)
 
+# Add interface library
+add_library(vulkan-prebuilt
+    INTERFACE
+)
+
 # Per-platform configuration
-if (APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (IOS OR TVOS)
+    # The iOS/tvOS libraries must be lipo'ed together when using legacy build systems.
+    if (IOS)
+        set(_LIBS ios-arm64 ios-x86_64-simulator)
+    else()
+        set(_LIBS tvos-arm64 tvos-x86_64-simulator)
+    endif()
+    list(TRANSFORM _LIBS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/sdk/macos/MoltenVK/MoltenVK.xcframework/)
+    list(TRANSFORM _LIBS APPEND /libMoltenVK.a)
+
+    add_custom_target(vulkan-prebuilt-lipo ALL
+        COMMAND lipo -create ${_LIBS} -output ${CMAKE_CURRENT_BINARY_DIR}/libMoltenVK.a
+        DEPENDS ${_LIBS}
+        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/libMoltenVK.a
+        COMMENT "Combining arch libraries (${_LIBS}) into a single 'fat' library (${CMAKE_CURRENT_BINARY_DIR}/libModelVK.a)"
+    )
+
+    add_dependencies(vulkan-prebuilt
+        vulkan-prebuilt-lipo
+    )
+
+    set(VULKAN_PREBUILT_HEADERS sdk/macos/MoltenVK/include/)
+    set(VULKAN_PREBUILT_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR})
+    set(VULKAN_PREBUILT_LIBRARY_NAME libMoltenVK.a)
+    set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES
+        "-framework Metal"
+    )
+elseif (APPLE)
+    # Fallback to building for MacOS
     set(VULKAN_PREBUILT_HEADERS sdk/macos/MoltenVK/include/)
     set(VULKAN_PREBUILT_LIBRARY_PATH sdk/macos/MoltenVK/MoltenVK.xcframework/macos-x86_64)
     set(VULKAN_PREBUILT_LIBRARY_NAME libMoltenVK.a)
@@ -31,11 +64,6 @@ set(VERSION_CONFIG "${GENERATED_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
 set(PROJECT_CONFIG "${GENERATED_DIR}/${PROJECT_NAME}Config.cmake")
 set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
 set(NAMESPACE "${PROJECT_NAME}::")
-
-# Add interface library
-add_library(vulkan-prebuilt
-    INTERFACE
-)
 
 # Add header search paths
 target_include_directories(vulkan-prebuilt

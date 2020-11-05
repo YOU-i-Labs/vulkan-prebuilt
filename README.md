@@ -4,7 +4,11 @@ to be pulled in by Hunter.
 
 # Supported platforms
 
-- OSX
+- macOS
+- iOS
+- tvOS
+
+iOS and tvOS require an appropriate toolchain file to be used.
 
 # Source Packages
 
@@ -12,7 +16,7 @@ The prebuilt binaries contained in the repository are copied directly
 from official Vulkan SDK releases. The following lists the various
 releases used, as well as their versions.
 
-## MacOS
+## MacOS / iOS / tvOS
 
 Filename: [vulkansdk-macos-1.2.154.0.dmg](https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/1.2.154.0/mac/vulkansdk-macos-1.2.154.0.dmg)
 
