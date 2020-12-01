@@ -7,6 +7,7 @@ to be pulled in by Hunter.
 - macOS
 - iOS
 - tvOS
+- Win64
 
 iOS and tvOS require an appropriate toolchain file to be used.
 
@@ -21,6 +22,12 @@ releases used, as well as their versions.
 Filename: [vulkansdk-macos-1.2.154.0.dmg](https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/1.2.154.0/mac/vulkansdk-macos-1.2.154.0.dmg)
 
 MD5: `f0fea776e02ac92dbb47ba8bdad4130c`
+
+## Win64
+
+Filename: [VulkanSDK-1.2.154.1-Installer.exe](https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/1.2.154.1/windows/VulkanSDK-1.2.154.1-Installer.exe)
+
+MD5: `7609be3d8b7d11d3438064eabb4cd4b7`
 
 # Porting and Testing
 

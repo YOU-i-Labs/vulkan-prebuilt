@@ -47,6 +47,12 @@ elseif (APPLE)
         "-framework IOKit"
         "-framework QuartzCore"
     )
+elseif (WIN32 AND NOT WINDOWS_STORE)
+    # Fallback to building for MacOS
+    set(VULKAN_PREBUILT_HEADERS sdk/windows/Include/)
+    set(VULKAN_PREBUILT_LIBRARY_PATH sdk/windows/Lib)
+    set(VULKAN_PREBUILT_LIBRARY_NAME vulkan-1.lib)
+    set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES)
 else()
     message(FATAL_ERROR "Usage of this prebuilt library is not supported on this platform.")
 endif()
