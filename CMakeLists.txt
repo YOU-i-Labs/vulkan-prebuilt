@@ -35,6 +35,7 @@ if (IOS OR TVOS)
     set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES
         "-framework Metal"
     )
+    set(VULKAN_PREBUILT_BIN_GLSLC sdk/macos/bin/glslc)
 elseif (APPLE)
     # Fallback to building for MacOS
     set(VULKAN_PREBUILT_HEADERS sdk/macos/MoltenVK/include/)
@@ -47,12 +48,14 @@ elseif (APPLE)
         "-framework IOKit"
         "-framework QuartzCore"
     )
+    set(VULKAN_PREBUILT_BIN_GLSLC sdk/macos/bin/glslc)
 elseif (WIN32 AND NOT WINDOWS_STORE)
     # Fallback to building for MacOS
     set(VULKAN_PREBUILT_HEADERS sdk/windows/Include/)
     set(VULKAN_PREBUILT_LIBRARY_PATH sdk/windows/Lib)
     set(VULKAN_PREBUILT_LIBRARY_NAME vulkan-1.lib)
     set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES)
+    set(VULKAN_PREBUILT_BIN_GLSLC sdk/windows/Bin/glslc.exe)
 else()
     message(FATAL_ERROR "Usage of this prebuilt library is not supported on this platform.")
 endif()
@@ -132,6 +135,14 @@ install(
         ${VULKAN_PREBUILT_LIBRARY_PATH}/${VULKAN_PREBUILT_LIBRARY_NAME}
     DESTINATION
         ${CMAKE_INSTALL_LIBDIR}
+)
+
+# install vulkan bins
+install(
+    PROGRAMS
+        ${VULKAN_PREBUILT_BIN_GLSLC}
+    DESTINATION
+        ${CMAKE_INSTALL_BINDIR}
 )
 
 install(
