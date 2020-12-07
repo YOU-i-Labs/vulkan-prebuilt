@@ -5,6 +5,11 @@ include("${CMAKE_CURRENT_LIST_DIR}/vulkan-prebuiltTargets.cmake")
 
 check_required_components("@PROJECT_NAME@")
 
+if(APPLE)
+    find_package(metal REQUIRED)
+    find_package(quartzcore REQUIRED)
+endif()
+
 get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
 get_filename_component(_IMPORT_PREFIX ${_IMPORT_PREFIX}/../.. ABSOLUTE)
 target_link_options(vulkan-prebuilt::vulkan-prebuilt
