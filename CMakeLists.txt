@@ -18,6 +18,11 @@ if (IOS OR TVOS)
     list(TRANSFORM _LIBS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/sdk/macos/MoltenVK/MoltenVK.xcframework/)
     list(TRANSFORM _LIBS APPEND /libMoltenVK.a)
 
+    # On iOS, a 'dummy' symbol for armv7 must also be included. Vulkan is not available on armv7 -- this symbol is there only to prevent linker warnings.
+    if (IOS)
+        list(APPEND _LIBS ${CMAKE_CURRENT_SOURCE_DIR}/other/dummy_ios_armv7_symbol/lib/dummy.a)
+    endif()
+
     add_custom_target(vulkan-prebuilt-lipo ALL
         COMMAND lipo -create ${_LIBS} -output ${CMAKE_CURRENT_BINARY_DIR}/libMoltenVK.a
         DEPENDS ${_LIBS}
