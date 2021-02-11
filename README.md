@@ -8,6 +8,7 @@ to be pulled in by Hunter.
 - iOS
 - tvOS
 - Win64
+- Linux
 
 iOS and tvOS require an appropriate toolchain file to be used.
 
@@ -28,6 +29,12 @@ MD5: `f0fea776e02ac92dbb47ba8bdad4130c`
 Filename: [VulkanSDK-1.2.154.1-Installer.exe](https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/1.2.154.1/windows/VulkanSDK-1.2.154.1-Installer.exe)
 
 MD5: `7609be3d8b7d11d3438064eabb4cd4b7`
+
+## Linux
+
+Filename: [vulkansdk-linux-x86_64-1.2.154.0.tar.gz](https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/1.2.154.0/linux/vulkansdk-linux-x86_64-1.2.154.0.tar.gz)
+
+MD5: `91c548e851d4c679c072c109aae8a775`
 
 # Porting and Testing
 
