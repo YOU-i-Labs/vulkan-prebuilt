@@ -15,7 +15,7 @@ if (IOS OR TVOS)
     else()
         set(_LIBS tvos-arm64 tvos-x86_64-simulator)
     endif()
-    list(TRANSFORM _LIBS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/sdk/macos/MoltenVK/MoltenVK.xcframework/)
+    list(TRANSFORM _LIBS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/sdk/ios_tvos-only/MoltenVK/MoltenVK.xcframework/)
     list(TRANSFORM _LIBS APPEND /libMoltenVK.a)
 
     # On iOS, a 'dummy' symbol for armv7 must also be included. Vulkan is not available on armv7 -- this symbol is there only to prevent linker warnings.
@@ -34,18 +34,18 @@ if (IOS OR TVOS)
         vulkan-prebuilt-lipo
     )
 
-    set(VULKAN_PREBUILT_HEADERS sdk/macos/MoltenVK/include/)
+    set(VULKAN_PREBUILT_HEADERS sdk/ios_tvos-only/MoltenVK/include/)
     set(VULKAN_PREBUILT_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR})
     set(VULKAN_PREBUILT_LIBRARY_NAME libMoltenVK.a)
     set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES
         "-framework Metal"
     )
-    set(VULKAN_PREBUILT_BIN_GLSLC sdk/macos/bin/glslc)
-    set(VULKAN_PREBUILT_BIN_SPIRV_CROSS sdk/macos/bin/spirv-cross)
+    set(VULKAN_PREBUILT_BIN_GLSLC sdk/ios_tvos-only/bin/glslc)
+    set(VULKAN_PREBUILT_BIN_SPIRV_CROSS sdk/ios_tvos-only/bin/spirv-cross)
 elseif (APPLE)
     # Fallback to building for MacOS
-    set(VULKAN_PREBUILT_HEADERS sdk/macos/MoltenVK/include/)
-    set(VULKAN_PREBUILT_LIBRARY_PATH sdk/macos/MoltenVK/MoltenVK.xcframework/macos-x86_64)
+    set(VULKAN_PREBUILT_HEADERS sdk/macos-only/MoltenVK/include/)
+    set(VULKAN_PREBUILT_LIBRARY_PATH sdk/macos-only/MoltenVK/MoltenVK.xcframework/macos-arm64_x86_64)
     set(VULKAN_PREBUILT_LIBRARY_NAME libMoltenVK.a)
     set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES
         "-framework IOSurface"
@@ -54,8 +54,8 @@ elseif (APPLE)
         "-framework IOKit"
         "-framework QuartzCore"
     )
-    set(VULKAN_PREBUILT_BIN_GLSLC sdk/macos/bin/glslc)
-    set(VULKAN_PREBUILT_BIN_SPIRV_CROSS sdk/macos/bin/spirv-cross)
+    set(VULKAN_PREBUILT_BIN_GLSLC sdk/macos-only/bin/glslc)
+    set(VULKAN_PREBUILT_BIN_SPIRV_CROSS sdk/macos-only/bin/spirv-cross)
 elseif (WIN32 AND NOT WINDOWS_STORE)
     set(VULKAN_PREBUILT_HEADERS sdk/windows/Include/)
     set(VULKAN_PREBUILT_LIBRARY_PATH sdk/windows/Lib)

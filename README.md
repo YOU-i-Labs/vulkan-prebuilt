@@ -18,7 +18,13 @@ The prebuilt binaries contained in the repository are copied directly
 from official Vulkan SDK releases. The following lists the various
 releases used, as well as their versions.
 
-## MacOS / iOS / tvOS
+## MacOS
+
+Filename: [vulkansdk-macos-1.2.162.1.dmg](https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/1.2.162.1/mac/vulkansdk-macos-1.2.162.1.dmg)
+
+MD5: `64088b71f9703ac032f427a17a7f7b41`
+
+## iOS / tvOS
 
 Filename: [vulkansdk-macos-1.2.154.0.dmg](https://vulkan.lunarg.com/sdk/home#sdk/downloadConfirm/1.2.154.0/mac/vulkansdk-macos-1.2.154.0.dmg)
 
