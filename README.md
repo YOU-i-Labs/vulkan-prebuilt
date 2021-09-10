@@ -50,6 +50,13 @@ On Linux, the vulkan sdk provides only a shared library, so we'll need to build 
 3. Run `./vulkansdk vulkan-loader`
 4. The static library will be created at `x86_64/lib/libvulkan.a`
 
+Enabling the validation layers on Linux:
+The validation layers require that the app to be dynamically linked against the vulkan library.
+A dynamic version of this library can be found in the Vulkan SDK.
+In order to use the Vulkan SDK, the environment must point to folder containing it.
+Add in your `.bashrc` or `.zshrc` the following line:
+`source ${path-to-vulkan-sdk}/1.2.154.0/setup-env.sh`, where `path-to-vulkan-sdk` points to the folder where the sdk has been extracted.
+
 # Porting and Testing
 
 The script `build.sh` can be used to build the library and 'install' it
