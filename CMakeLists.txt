@@ -24,22 +24,19 @@ if (CMAKE_CROSSCOMPILING)
     # Per non-development platform configuration
     if (IOS OR TVOS)
         # The iOS/tvOS libraries must be lipo'ed together when using legacy build systems.
+        # Note: The vulkan sdk ios-arm64_x86_64-simulator/libMoltenVK.a already contains an arm64 architecture which must be replaced with ios-arm64/libMoltenVK.a
         if (IOS)
-            set(_LIBS ios-arm64 ios-x86_64-simulator)
+            set(_LIB_ARM_X86 ${CMAKE_CURRENT_SOURCE_DIR}/sdk/ios_tvos-only/MoltenVK/MoltenVK.xcframework/ios-x86_64-simulator/libMoltenVK.a)
+            set(_LIB_ARM ${CMAKE_CURRENT_SOURCE_DIR}/sdk/ios_tvos-only/MoltenVK/MoltenVK.xcframework/ios-arm64/libMoltenVK.a)
         else()
-            set(_LIBS tvos-arm64 tvos-x86_64-simulator)
-        endif()
-        list(TRANSFORM _LIBS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/sdk/ios_tvos-only/MoltenVK/MoltenVK.xcframework/)
-        list(TRANSFORM _LIBS APPEND /libMoltenVK.a)
-
-        # On iOS, a 'dummy' symbol for armv7 must also be included. Vulkan is not available on armv7 -- this symbol is there only to prevent linker warnings.
-        if (IOS)
-            list(APPEND _LIBS ${CMAKE_CURRENT_SOURCE_DIR}/other/dummy_ios_armv7_symbol/lib/dummy.a)
+            set(_LIB_ARM_X86 ${CMAKE_CURRENT_SOURCE_DIR}/sdk/ios_tvos-only/MoltenVK/MoltenVK.xcframework/tvos-x86_64-simulator/libMoltenVK.a)
+            set(_LIB_ARM ${CMAKE_CURRENT_SOURCE_DIR}/sdk/ios_tvos-only/MoltenVK/MoltenVK.xcframework/tvos-arm64/libMoltenVK.a)
         endif()
 
         add_custom_target(vulkan-prebuilt-lipo ALL
-            COMMAND lipo -create ${_LIBS} -output ${CMAKE_CURRENT_BINARY_DIR}/libMoltenVK.a
-            DEPENDS ${_LIBS}
+            COMMAND lipo ${_LIB_ARM_X86} -thin x86_64 -output ${CMAKE_CURRENT_BINARY_DIR}/lib-x86-simulator.a
+            COMMAND lipo -create ${CMAKE_CURRENT_BINARY_DIR}/lib-x86-simulator.a ${_LIB_ARM} -output ${CMAKE_CURRENT_BINARY_DIR}/libMoltenVK.a
+            DEPENDS ${_LIB_ARM} ${_LIB_ARM_X86}
             BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/libMoltenVK.a
             COMMENT "Combining arch libraries (${_LIBS}) into a single 'fat' library (${CMAKE_CURRENT_BINARY_DIR}/libModelVK.a)"
         )
@@ -53,6 +50,7 @@ if (CMAKE_CROSSCOMPILING)
         set(VULKAN_PREBUILT_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR})
         set(VULKAN_PREBUILT_LIBRARY_NAME libMoltenVK.a)
         set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES
+            "-framework IOSurface"
             "-framework Metal"
         )
     endif()
@@ -74,16 +72,14 @@ else()
         set(VULKAN_PREBUILT_BIN_GLSLC sdk/macos-only/bin/glslc)
         set(VULKAN_PREBUILT_BIN_SPIRV_CROSS sdk/macos-only/bin/spirv-cross)
     elseif (WIN32 AND NOT WINDOWS_STORE)
-        set(VULKAN_PREBUILT_VULKAN_HEADERS sdk/include/)
-        set(VULKAN_PREBUILT_GLAD_HEADERS other/glad/include/)
+        set(VULKAN_PREBUILT_VULKAN_HEADERS other/glad/include/)
         set(VULKAN_PREBUILT_LIBRARY_PATH)
         set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES)
         set(VULKAN_PREBUILT_BIN_GLSLC sdk/windows/Bin/glslc.exe)
         set(VULKAN_PREBUILT_BIN_SPIRV_CROSS sdk/windows/Bin/spirv-cross.exe)
         include(VulkanGlad.cmake)
     elseif (UNIX)
-        set(VULKAN_PREBUILT_VULKAN_HEADERS sdk/include/)
-        set(VULKAN_PREBUILT_GLAD_HEADERS other/glad/include/)
+        set(VULKAN_PREBUILT_VULKAN_HEADERS other/glad/include/)
         set(VULKAN_PREBUILT_LIBRARY_PATH)
         set(VULKAN_PREBUILT_DEPENDENT_LIBRARIES)
         set(VULKAN_PREBUILT_BIN_GLSLC sdk/linux/bin/glslc)
@@ -110,7 +106,7 @@ if (DEFINED VULKAN_PREBUILT_VULKAN_HEADERS)
     # Add vulkan header search paths
     target_include_directories(vulkan-prebuilt
         INTERFACE
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/vulkan-prebuilt>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${VULKAN_PREBUILT_VULKAN_HEADERS}>
     )
 endif()
@@ -119,17 +115,8 @@ if (VULKAN_PREBUILT_MOLTENVK_HEADERS)
     # Add MoltenVK header search paths
     target_include_directories(vulkan-prebuilt
         INTERFACE
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/vulkan-prebuilt>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${VULKAN_PREBUILT_MOLTENVK_HEADERS}>
-    )
-endif()
-
-if (VULKAN_PREBUILT_GLAD_HEADERS)
-    # Add glad header search paths
-    target_include_directories(vulkan-prebuilt
-        INTERFACE
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${VULKAN_PREBUILT_GLAD_HEADERS}>
     )
 endif()
 
@@ -181,7 +168,7 @@ if (DEFINED VULKAN_PREBUILT_VULKAN_HEADERS)
         DIRECTORY
             ${VULKAN_PREBUILT_VULKAN_HEADERS}
         DESTINATION
-            ${CMAKE_INSTALL_INCLUDEDIR}
+            ${CMAKE_INSTALL_INCLUDEDIR}/vulkan-prebuilt
     )
 endif()
 
@@ -191,17 +178,7 @@ if (DEFINED VULKAN_PREBUILT_MOLTENVK_HEADERS)
         DIRECTORY
             ${VULKAN_PREBUILT_MOLTENVK_HEADERS}
         DESTINATION
-            ${CMAKE_INSTALL_INCLUDEDIR}
-    )
-endif()
-
-if (DEFINED VULKAN_PREBUILT_GLAD_HEADERS)
-    # install glad headers
-    install(
-        DIRECTORY
-            ${VULKAN_PREBUILT_GLAD_HEADERS}
-        DESTINATION
-            ${CMAKE_INSTALL_INCLUDEDIR}
+            ${CMAKE_INSTALL_INCLUDEDIR}/vulkan-prebuilt
     )
 endif()
 

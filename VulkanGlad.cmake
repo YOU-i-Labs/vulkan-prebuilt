@@ -5,7 +5,6 @@ add_library(vulkan-glad
 
 target_include_directories(vulkan-glad
     PRIVATE
-        sdk/include
         other/glad/include
 )
 
