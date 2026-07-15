@@ -7,6 +7,13 @@ add_library(vulkan-prebuilt
     INTERFACE
 )
 
+# Configure installation variables
+# Introduce variables:
+# * CMAKE_INSTALL_LIBDIR
+# * CMAKE_INSTALL_BINDIR
+# * CMAKE_INSTALL_INCLUDEDIR
+include(GNUInstallDirs)
+
 if (CMAKE_CROSSCOMPILING)
     if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
         set(VULKAN_PREBUILT_BIN_GLSLC sdk/ios_tvos-only/bin/glslc)
@@ -58,6 +65,14 @@ if (CMAKE_CROSSCOMPILING)
             "-framework IOSurface"
             "-framework Metal"
         )
+    elseif(ANDROID)
+      # most vulkan SDK components are distributed with the NDK, the validation layers
+      # are the only component which are not
+      install(
+            DIRECTORY
+                "sdk/android/"
+            TYPE LIB
+        )
     endif()
 else()
     # Per development platform configuration
@@ -98,13 +113,6 @@ else()
         include(VulkanGlad.cmake)
     endif()
 endif()
-
-# Configure installation variables
-# Introduce variables:
-# * CMAKE_INSTALL_LIBDIR
-# * CMAKE_INSTALL_BINDIR
-# * CMAKE_INSTALL_INCLUDEDIR
-include(GNUInstallDirs)
 
 set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set(INSTALL_CONFIGDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")

@@ -41,3 +41,11 @@ if (NOT TARGET Vulkan::spirv-cross)
     set_target_properties(Vulkan::spirv-cross PROPERTIES IMPORTED_LOCATION_RELEASE ${_SPIRV_CROSS})
     message(STATUS "Using imported vulkan spirv-cross${_PROGRAM_SUFFIX} from host: ${_SPIRV_CROSS}")
 endif()
+
+# Android's validation layers do not come with the platform's Vulkan SDK
+if (NOT TARGET Vulkan::validation-layers AND ANDROID)
+    set(_VALIDATION_LAYER_DIR "${CMAKE_CURRENT_LIST_DIR}/../../validationLayers")
+    add_library(Vulkan::validation-layers MODULE IMPORTED)
+    set_target_properties(Vulkan::validation-layers PROPERTIES IMPORTED_LOCATION_RELEASE ${_VALIDATION_LAYER_DIR})
+    message(STATUS "Using vulkan validation layers: ${_VALIDATION_LAYER_DIR}")
+endif()
